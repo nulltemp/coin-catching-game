@@ -1,0 +1,8 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "es6",
+    "checkJs": true
+  },
+  "include": ["src/**/*", "node_modules/phaser/types/phaser.d.ts"]
+}
