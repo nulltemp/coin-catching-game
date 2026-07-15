@@ -27,13 +27,13 @@ let cursors;
 const game = new Phaser.Game(config);
 
 function preload() {
-  this.load.image("player", "assets/player.png"); // プレイヤーの画像（一時的なもの、後で修正）
-  this.load.image("coin", "assets/coin.png"); // コインの画像（一時的なもの、後で修正）
+  this.load.image("player", "assets/player.png");
+  this.load.image("coin", "assets/coin.png");
 }
 
 function create() {
   // プレイヤーの作成
-  player = this.add.rectangle(400, 550, 80, 20, 0x0000ff); // 青い四角形
+  player = this.physics.add.sprite(400, 550, "player");
   this.physics.add.existing(player);
   player.body.setCollideWorldBounds(true);
   player.body.allowGravity = false;
@@ -85,9 +85,7 @@ function update() {
 
 function generateCoin() {
   const x = Phaser.Math.Between(50, 750); // ランダムなX座標
-  const coin = coins.create(x, 0, "coin"); // 黄色の円（一時的なもの、後で修正）
-  coin.body.setCircle(10); // 円形にする
-  coin.setTint(0xffff00); // 黄色に設定
+  const coin = coins.create(x, 0, "coin");
   coin.body.setCollideWorldBounds(false);
   coin.body.setGravityY(200);
 }
