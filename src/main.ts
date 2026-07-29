@@ -28,6 +28,13 @@ let score = 0;
 let scoreText: Phaser.GameObjects.Text;
 let cursors: Phaser.Types.Input.Keyboard.CursorKeys;
 
+const TIME_LIMIT = 20; // 秒
+let remainingTime = TIME_LIMIT;
+let timerText: Phaser.GameObjects.Text;
+let spawnEvent: Phaser.Time.TimerEvent;
+let countdownEvent: Phaser.Time.TimerEvent;
+let isGameOver = false;
+
 const game = new Phaser.Game(config);
 
 function preload(this: Phaser.Scene) {
@@ -36,6 +43,11 @@ function preload(this: Phaser.Scene) {
 }
 
 function create(this: Phaser.Scene) {
+  // 状態のリセット（scene.restart() での再実行に対応）
+  score = 0;
+  remainingTime = TIME_LIMIT;
+  isGameOver = false;
+
   // プレイヤーの作成
   player = this.physics.add.sprite(400, 550, "player");
   this.physics.add.existing(player);
@@ -53,13 +65,33 @@ function create(this: Phaser.Scene) {
     color: "#fff",
   });
 
+  // 制限時間表示
+  timerText = this.add.text(650, 16, `Time: ${remainingTime}`, {
+    fontSize: "32px",
+    color: "#fff",
+  });
+
   // カーソルキーの割り当て
   cursors = this.input.keyboard!.createCursorKeys();
 
   // コインを生成するタイマーイベント
-  this.time.addEvent({
+  spawnEvent = this.time.addEvent({
     delay: 1000, // 1秒ごとにコインを生成
     callback: generateCoin,
+    callbackScope: this,
+    loop: true,
+  });
+
+  // 制限時間をカウントダウンするタイマーイベント
+  countdownEvent = this.time.addEvent({
+    delay: 1000,
+    callback: () => {
+      remainingTime -= 1;
+      timerText.setText(`Time: ${remainingTime}`);
+      if (remainingTime <= 0) {
+        endGame.call(this);
+      }
+    },
     callbackScope: this,
     loop: true,
   });
@@ -68,7 +100,39 @@ function create(this: Phaser.Scene) {
   this.physics.add.overlap(player, coins, collectCoin, undefined, this);
 }
 
-function update() {
+function endGame(this: Phaser.Scene) {
+  if (isGameOver) return;
+  isGameOver = true;
+
+  spawnEvent.remove();
+  countdownEvent.remove();
+  this.physics.pause();
+
+  this.add
+    .text(400, 250, `Game Over\nScore: ${score}`, {
+      fontSize: "48px",
+      color: "#fff",
+      align: "center",
+    })
+    .setOrigin(0.5);
+
+  this.add
+    .text(400, 380, "もう一度プレイ", {
+      fontSize: "32px",
+      color: "#0f0",
+      backgroundColor: "#333",
+      padding: { x: 20, y: 10 },
+    })
+    .setOrigin(0.5)
+    .setInteractive({ useHandCursor: true })
+    .on("pointerdown", () => {
+      this.scene.restart();
+    });
+}
+
+function update(this: Phaser.Scene) {
+  if (isGameOver) return;
+
   // プレイヤーの移動
   if (cursors.left.isDown) {
     playerBody.setVelocityX(-300);
