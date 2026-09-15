@@ -21,11 +21,32 @@ const config: Phaser.Types.Core.GameConfig = {
   },
 };
 
+const HIGH_SCORE_KEY = "coin-catching-game-high-score";
+
+function loadHighScore(): number {
+  try {
+    const saved = localStorage.getItem(HIGH_SCORE_KEY);
+    return saved ? parseInt(saved, 10) || 0 : 0;
+  } catch {
+    return 0;
+  }
+}
+
+function saveHighScore(value: number) {
+  try {
+    localStorage.setItem(HIGH_SCORE_KEY, String(value));
+  } catch {
+    // localStorageが使えない環境（プライベートモード等）では保存をスキップ
+  }
+}
+
 let player: Phaser.Physics.Arcade.Sprite;
 let playerBody: Phaser.Physics.Arcade.Body;
 let coins: Phaser.Physics.Arcade.Group;
 let score = 0;
 let scoreText: Phaser.GameObjects.Text;
+let highScore = loadHighScore();
+let highScoreText: Phaser.GameObjects.Text;
 let cursors: Phaser.Types.Input.Keyboard.CursorKeys;
 
 const TIME_LIMIT = 20; // 秒
@@ -63,6 +84,12 @@ function create(this: Phaser.Scene) {
   scoreText = this.add.text(16, 16, "Score: 0", {
     fontSize: "32px",
     color: "#fff",
+  });
+
+  // ハイスコア表示
+  highScoreText = this.add.text(16, 56, `High Score: ${highScore}`, {
+    fontSize: "24px",
+    color: "#ff0",
   });
 
   // 制限時間表示
@@ -108,16 +135,28 @@ function endGame(this: Phaser.Scene) {
   countdownEvent.remove();
   this.physics.pause();
 
+  const isNewRecord = score > highScore;
+  if (isNewRecord) {
+    highScore = score;
+    saveHighScore(highScore);
+    highScoreText.setText(`High Score: ${highScore}`);
+  }
+
   this.add
-    .text(400, 250, `Game Over\nScore: ${score}`, {
-      fontSize: "48px",
-      color: "#fff",
-      align: "center",
-    })
+    .text(
+      400,
+      250,
+      `Game Over\nScore: ${score}\nHigh Score: ${highScore}${isNewRecord ? "\nNew Record!" : ""}`,
+      {
+        fontSize: "48px",
+        color: "#fff",
+        align: "center",
+      }
+    )
     .setOrigin(0.5);
 
   this.add
-    .text(400, 380, "もう一度プレイ", {
+    .text(400, 430, "もう一度プレイ", {
       fontSize: "32px",
       color: "#0f0",
       backgroundColor: "#333",
