@@ -7,6 +7,8 @@ Phaser 4 と TypeScript で作られた、シンプルなコインキャッチ�
 ## 遊び方
 
 - ← / → キーでプレイヤー（青いバー）を左右に移動
+- スマホ・タブレットでは画面をタッチ（PCではマウスを押したまま）すると、その位置へプレイヤーが移動
+- 5秒ごとにレベルが上がり、コインの出現間隔が短く・落下速度が速くなる
 - 上から降ってくるコインに触れるとスコア+1
 - 制限時間（20秒）が0になるとゲームオーバー
 - ゲームオーバー画面の「もう一度プレイ」をクリックするとリスタート
@@ -61,10 +63,11 @@ npm run dev
 ゲームロジックはすべて [src/main.ts](src/main.ts) にまとまっています。
 
 - `player` — 画面下部のスプライト。矢印キーで左右移動、重力なし、`immovable`
-- `coins` — Arcade Physics のグループ。1秒ごとにタイマーでランダムなX座標に生成され、重力で落下
+- `coins` — Arcade Physics のグループ。`scheduleSpawn` でランダムなX座標に生成され、重力で落下
+- `level` / `levelText` — 経過時間から `updateLevel` で算出。レベルに応じてコインの出現間隔（1000ms→最短400ms）と初速が変化
 - `score` / `scoreText` — コインと `player` が重なる（`collectCoin`）たびに加算
 - `remainingTime` / `timerText` — 1秒ごとにカウントダウンし、0になると `endGame` を呼びゲームを停止
-- `generateCoin` はタイマーと `collectCoin`（コイン取得時の即時補充）の両方から呼ばれる
+- `generateCoin` は`scheduleSpawn` と `collectCoin`（コイン取得時の即時補充）の両方から呼ばれる
 - コインは y=600 を超えると `update` 内で破棄される
 
 アセット（`assets/player.png`, `assets/coin.png`）は `preload` 内で `public/assets/` を参照しており、dev / build のどちらでも同じ相対パスで配信されます。
