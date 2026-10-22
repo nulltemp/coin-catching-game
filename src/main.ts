@@ -4,6 +4,11 @@ const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
   width: 800,
   height: 600,
+  scale: {
+    // 画面サイズに合わせて縦横比を保ったまま拡大縮小（スマホ対応）
+    mode: Phaser.Scale.FIT,
+    autoCenter: Phaser.Scale.CENTER_BOTH,
+  },
   physics: {
     default: "arcade",
     arcade: {
@@ -50,6 +55,17 @@ let highScoreText: Phaser.GameObjects.Text;
 let cursors: Phaser.Types.Input.Keyboard.CursorKeys;
 
 const TIME_LIMIT = 20; // 秒
+const PLAYER_SPEED = 300;
+
+// 難易度: LEVEL_DURATION 秒ごとにレベルが上がり、コインの出現間隔が短く・落下が速くなる
+const LEVEL_DURATION = 5; // 秒
+const BASE_SPAWN_DELAY = 1000; // ミリ秒
+const SPAWN_DELAY_STEP = 200; // レベルごとに短くなる出現間隔
+const MIN_SPAWN_DELAY = 400;
+const FALL_SPEED_STEP = 120; // レベルごとに加算されるコインの初速
+
+let level = 1;
+let levelText: Phaser.GameObjects.Text;
 let remainingTime = TIME_LIMIT;
 let timerText: Phaser.GameObjects.Text;
 let spawnEvent: Phaser.Time.TimerEvent;
@@ -67,6 +83,7 @@ function create(this: Phaser.Scene) {
   // 状態のリセット（scene.restart() での再実行に対応）
   score = 0;
   remainingTime = TIME_LIMIT;
+  level = 1;
   isGameOver = false;
 
   // プレイヤーの作成
@@ -98,16 +115,19 @@ function create(this: Phaser.Scene) {
     color: "#fff",
   });
 
+  // レベル表示
+  levelText = this.add
+    .text(400, 16, `Lv: ${level}`, {
+      fontSize: "32px",
+      color: "#0ff",
+    })
+    .setOrigin(0.5, 0);
+
   // カーソルキーの割り当て
   cursors = this.input.keyboard!.createCursorKeys();
 
-  // コインを生成するタイマーイベント
-  spawnEvent = this.time.addEvent({
-    delay: 1000, // 1秒ごとにコインを生成
-    callback: generateCoin,
-    callbackScope: this,
-    loop: true,
-  });
+  // コインを生成するタイマー（レベルに応じて間隔が変わるので毎回スケジュールし直す）
+  scheduleSpawn.call(this);
 
   // 制限時間をカウントダウンするタイマーイベント
   countdownEvent = this.time.addEvent({
@@ -117,6 +137,8 @@ function create(this: Phaser.Scene) {
       timerText.setText(`Time: ${remainingTime}`);
       if (remainingTime <= 0) {
         endGame.call(this);
+      } else {
+        updateLevel();
       }
     },
     callbackScope: this,
@@ -125,6 +147,23 @@ function create(this: Phaser.Scene) {
 
   // プレイヤーとコインの衝突判定
   this.physics.add.overlap(player, coins, collectCoin, undefined, this);
+}
+
+function scheduleSpawn(this: Phaser.Scene) {
+  const delay = Math.max(MIN_SPAWN_DELAY, BASE_SPAWN_DELAY - (level - 1) * SPAWN_DELAY_STEP);
+  spawnEvent = this.time.delayedCall(delay, () => {
+    generateCoin();
+    scheduleSpawn.call(this);
+  });
+}
+
+function updateLevel() {
+  const elapsed = TIME_LIMIT - remainingTime;
+  const newLevel = 1 + Math.floor(elapsed / LEVEL_DURATION);
+  if (newLevel !== level) {
+    level = newLevel;
+    levelText.setText(`Lv: ${level}`);
+  }
 }
 
 function endGame(this: Phaser.Scene) {
@@ -172,11 +211,15 @@ function endGame(this: Phaser.Scene) {
 function update(this: Phaser.Scene) {
   if (isGameOver) return;
 
-  // プレイヤーの移動
+  // プレイヤーの移動（キーボード優先、なければタッチ／マウスの位置へ追従）
+  const pointer = this.input.activePointer;
   if (cursors.left.isDown) {
-    playerBody.setVelocityX(-300);
+    playerBody.setVelocityX(-PLAYER_SPEED);
   } else if (cursors.right.isDown) {
-    playerBody.setVelocityX(300);
+    playerBody.setVelocityX(PLAYER_SPEED);
+  } else if (pointer.isDown) {
+    const dx = pointer.worldX - player.x;
+    playerBody.setVelocityX(Phaser.Math.Clamp(dx * 10, -PLAYER_SPEED, PLAYER_SPEED));
   } else {
     playerBody.setVelocityX(0);
   }
@@ -197,6 +240,7 @@ function generateCoin() {
   const coinBody = coin.body as Phaser.Physics.Arcade.Body;
   coinBody.setCollideWorldBounds(false);
   coinBody.setGravityY(200);
+  coinBody.setVelocityY((level - 1) * FALL_SPEED_STEP);
 }
 
 function collectCoin(
