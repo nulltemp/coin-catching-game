@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="ja">
 <head>
   <!-- Global site tag (gtag.js) - Google Analytics -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-Z2N4Q3MS7Y"></script>
@@ -12,7 +12,49 @@
   </script>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-  <title>Coin Catching Game</title>
+  <title>コインキャッチゲーム｜無料ブラウザゲーム（Coin Catching Game）</title>
+  <meta name="description" content="降ってくるコインをキャッチして20秒でハイスコアを狙う、無料のブラウザミニゲーム。インストール不要で、PCは矢印キー、スマホ・タブレットはタッチ操作ですぐに遊べます。">
+  <link rel="canonical" href="https://coin-catching-game.nulltemp.com/">
+  <meta name="theme-color" content="#000000">
+  <link rel="icon" type="image/png" href="/assets/coin.png">
+  <link rel="apple-touch-icon" href="/assets/coin.png">
+
+  <!-- OGP / SNS シェア -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="コインキャッチゲーム">
+  <meta property="og:title" content="コインキャッチゲーム｜無料ブラウザゲーム">
+  <meta property="og:description" content="降ってくるコインをキャッチして20秒でハイスコアを狙おう！インストール不要、PC・スマホですぐ遊べる無料ミニゲーム。">
+  <meta property="og:url" content="https://coin-catching-game.nulltemp.com/">
+  <meta property="og:image" content="https://coin-catching-game.nulltemp.com/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="夜空から降ってくる金色のコインと、それをキャッチする青いバー">
+  <meta property="og:locale" content="ja_JP">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="コインキャッチゲーム｜無料ブラウザゲーム">
+  <meta name="twitter:description" content="降ってくるコインをキャッチして20秒でハイスコアを狙おう！PC・スマホですぐ遊べる無料ミニゲーム。">
+  <meta name="twitter:image" content="https://coin-catching-game.nulltemp.com/og-image.png">
+
+  <!-- 構造化データ -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "VideoGame",
+    "name": "コインキャッチゲーム",
+    "alternateName": "Coin Catching Game",
+    "description": "降ってくるコインをキャッチして20秒でハイスコアを狙う、無料のブラウザミニゲーム。",
+    "url": "https://coin-catching-game.nulltemp.com/",
+    "image": "https://coin-catching-game.nulltemp.com/og-image.png",
+    "inLanguage": "ja",
+    "genre": ["Casual", "Arcade"],
+    "gamePlatform": ["Web browser", "PC", "Mobile"],
+    "applicationCategory": "Game",
+    "operatingSystem": "Any",
+    "playMode": "SinglePlayer",
+    "isAccessibleForFree": true,
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "JPY" }
+  }
+  </script>
   <style>
     body {
       margin: 0;
@@ -21,9 +63,32 @@
       overflow: hidden;
       touch-action: none;
     }
+    /* 見た目には表示せず、検索エンジンとスクリーンリーダー向けにゲーム説明を残す */
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      margin: -1px;
+      padding: 0;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+      border: 0;
+    }
   </style>
 </head>
 <body>
+  <main class="visually-hidden">
+    <h1>コインキャッチゲーム</h1>
+    <p>画面下の青いバーを左右に動かして、上から降ってくるコインをキャッチする無料のブラウザゲームです。制限時間は20秒で、5秒ごとにレベルが上がり、コインの出現が速くなります。ハイスコアはブラウザに保存されます。</p>
+    <h2>遊び方</h2>
+    <ul>
+      <li>PC：← / → キーで移動（マウスを押したままでも移動できます）</li>
+      <li>スマホ・タブレット：画面をタッチした位置へ移動</li>
+      <li>コインに触れるとスコア+1。時間が0になるとゲームオーバー</li>
+    </ul>
+  </main>
+  <noscript>このゲームを遊ぶには JavaScript を有効にしてください。</noscript>
   <script type="module" src="/src/main.ts"></script>
 </body>
 </html>
