@@ -112,11 +112,13 @@ function create(this: Phaser.Scene) {
     color: "#ff0",
   });
 
-  // 制限時間表示
-  timerText = this.add.text(650, 16, `Time: ${remainingTime}`, {
-    fontSize: "32px",
-    color: "#fff",
-  });
+  // 制限時間表示（右端から16pxの位置に右揃えで配置し、桁数が変わっても見切れないようにする）
+  timerText = this.add
+    .text(784, 16, `Time: ${remainingTime}`, {
+      fontSize: "32px",
+      color: "#fff",
+    })
+    .setOrigin(1, 0);
 
   // レベル表示
   levelText = this.add
