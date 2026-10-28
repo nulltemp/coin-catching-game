@@ -1,5 +1,8 @@
 import Phaser from "phaser";
 
+// コインの落下に使う重力（プレイヤーは allowGravity = false なので影響を受けない）
+const GRAVITY_Y = 400;
+
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
   width: 800,
@@ -14,7 +17,7 @@ const config: Phaser.Types.Core.GameConfig = {
     arcade: {
       gravity: {
         x: 0,
-        y: 200,
+        y: GRAVITY_Y,
       },
       debug: false,
     },
@@ -239,7 +242,6 @@ function generateCoin() {
   const coin = coins.create(x, 0, "coin") as Phaser.Physics.Arcade.Sprite;
   const coinBody = coin.body as Phaser.Physics.Arcade.Body;
   coinBody.setCollideWorldBounds(false);
-  coinBody.setGravityY(200);
   coinBody.setVelocityY((level - 1) * FALL_SPEED_STEP);
 }
 
