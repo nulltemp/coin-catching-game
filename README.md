@@ -11,7 +11,7 @@ Phaser 4 と TypeScript で作られた、シンプルなコインキャッチ�
 - 5秒ごとにレベルが上がり、コインの出現間隔が短く・落下速度が速くなる
 - 上から降ってくるコインに触れるとスコア+1
 - 制限時間（20秒）が0になるとゲームオーバー
-- ゲームオーバー画面の「もう一度プレイ」をクリックするとリスタート
+- ゲームオーバー画面の「もう一度プレイ」をクリック、または Space / Enter キーでリスタート
 
 ## セットアップ
 
@@ -54,6 +54,8 @@ npm run dev
 │   └── main.ts          # ゲームロジック一式（preload / create / update）
 ├── public/
 │   ├── assets/           # player.png, coin.png などの静的アセット
+│   ├── og-image.png      # SNS シェア用の OGP 画像
+│   ├── robots.txt
 │   └── sitemap.xml
 └── tsconfig.json
 ```

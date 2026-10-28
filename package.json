@@ -1,13 +1,12 @@
 {
   "name": "coin-catching-game",
   "version": "1.0.0",
-  "description": "",
+  "description": "降ってくるコインをキャッチして20秒でハイスコアを狙うブラウザミニゲーム（Phaser 4 + TypeScript + Vite）",
   "license": "ISC",
   "author": "",
-  "type": "commonjs",
-  "main": "index.js",
+  "private": true,
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",

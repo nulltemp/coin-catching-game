@@ -1,9 +1,19 @@
 import Phaser from "phaser";
 
+// ゲーム画面の論理サイズ（Phaser.Scale.FIT で実際の画面に合わせて拡大縮小される）
+const GAME_WIDTH = 800;
+const GAME_HEIGHT = 600;
+const CENTER_X = GAME_WIDTH / 2;
+const HUD_MARGIN = 16; // 画面端から HUD テキストまでの余白
+const COIN_SPAWN_MARGIN = 50; // コインを出現させない左右の余白
+
+// コインの落下に使う重力（プレイヤーは allowGravity = false なので影響を受けない）
+const GRAVITY_Y = 400;
+
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
-  width: 800,
-  height: 600,
+  width: GAME_WIDTH,
+  height: GAME_HEIGHT,
   scale: {
     // 画面サイズに合わせて縦横比を保ったまま拡大縮小（スマホ対応）
     mode: Phaser.Scale.FIT,
@@ -14,7 +24,7 @@ const config: Phaser.Types.Core.GameConfig = {
     arcade: {
       gravity: {
         x: 0,
-        y: 200,
+        y: GRAVITY_Y,
       },
       debug: false,
     },
@@ -87,8 +97,7 @@ function create(this: Phaser.Scene) {
   isGameOver = false;
 
   // プレイヤーの作成
-  player = this.physics.add.sprite(400, 550, "player");
-  this.physics.add.existing(player);
+  player = this.physics.add.sprite(CENTER_X, GAME_HEIGHT - 50, "player");
   playerBody = player.body as Phaser.Physics.Arcade.Body;
   playerBody.setCollideWorldBounds(true);
   playerBody.allowGravity = false;
@@ -98,26 +107,28 @@ function create(this: Phaser.Scene) {
   coins = this.physics.add.group();
 
   // スコア表示
-  scoreText = this.add.text(16, 16, "Score: 0", {
+  scoreText = this.add.text(HUD_MARGIN, HUD_MARGIN, "Score: 0", {
     fontSize: "32px",
     color: "#fff",
   });
 
   // ハイスコア表示
-  highScoreText = this.add.text(16, 56, `High Score: ${highScore}`, {
+  highScoreText = this.add.text(HUD_MARGIN, 56, `High Score: ${highScore}`, {
     fontSize: "24px",
     color: "#ff0",
   });
 
-  // 制限時間表示
-  timerText = this.add.text(650, 16, `Time: ${remainingTime}`, {
-    fontSize: "32px",
-    color: "#fff",
-  });
+  // 制限時間表示（右端から16pxの位置に右揃えで配置し、桁数が変わっても見切れないようにする）
+  timerText = this.add
+    .text(GAME_WIDTH - HUD_MARGIN, HUD_MARGIN, `Time: ${remainingTime}`, {
+      fontSize: "32px",
+      color: "#fff",
+    })
+    .setOrigin(1, 0);
 
   // レベル表示
   levelText = this.add
-    .text(400, 16, `Lv: ${level}`, {
+    .text(CENTER_X, HUD_MARGIN, `Lv: ${level}`, {
       fontSize: "32px",
       color: "#0ff",
     })
@@ -183,7 +194,7 @@ function endGame(this: Phaser.Scene) {
 
   this.add
     .text(
-      400,
+      CENTER_X,
       250,
       `Game Over\nScore: ${score}\nHigh Score: ${highScore}${isNewRecord ? "\nNew Record!" : ""}`,
       {
@@ -194,8 +205,16 @@ function endGame(this: Phaser.Scene) {
     )
     .setOrigin(0.5);
 
+  // ボタンとキーの同時入力で restart が二重に呼ばれないようにする
+  let restarting = false;
+  const restart = () => {
+    if (restarting) return;
+    restarting = true;
+    this.scene.restart();
+  };
+
   this.add
-    .text(400, 430, "もう一度プレイ", {
+    .text(CENTER_X, 430, "もう一度プレイ", {
       fontSize: "32px",
       color: "#0f0",
       backgroundColor: "#333",
@@ -203,9 +222,19 @@ function endGame(this: Phaser.Scene) {
     })
     .setOrigin(0.5)
     .setInteractive({ useHandCursor: true })
-    .on("pointerdown", () => {
-      this.scene.restart();
-    });
+    .on("pointerdown", restart);
+
+  // キーボードでもリスタートできるようにする（リスナーはシーン終了時に自動で解除される）
+  const keyboard = this.input.keyboard!;
+  keyboard.once("keydown-SPACE", restart);
+  keyboard.once("keydown-ENTER", restart);
+
+  this.add
+    .text(CENTER_X, 485, "Space / Enter でもリスタート", {
+      fontSize: "20px",
+      color: "#aaa",
+    })
+    .setOrigin(0.5);
 }
 
 function update(this: Phaser.Scene) {
@@ -224,22 +253,21 @@ function update(this: Phaser.Scene) {
     playerBody.setVelocityX(0);
   }
 
-  // 画面下部に到達したコインを削除し、新しいコインを生成
+  // 画面下部に到達したコインを削除
   const coinArray = coins.getChildren() as Phaser.Physics.Arcade.Sprite[];
   for (let i = coinArray.length - 1; i >= 0; i--) {
     const coin = coinArray[i];
-    if (coin.y > 600) {
+    if (coin.y > GAME_HEIGHT) {
       coin.destroy(); // 画面外に出たら削除（タイマーが次を生成するのでここでは生成しない）
     }
   }
 }
 
 function generateCoin() {
-  const x = Phaser.Math.Between(50, 750); // ランダムなX座標
+  const x = Phaser.Math.Between(COIN_SPAWN_MARGIN, GAME_WIDTH - COIN_SPAWN_MARGIN); // ランダムなX座標
   const coin = coins.create(x, 0, "coin") as Phaser.Physics.Arcade.Sprite;
   const coinBody = coin.body as Phaser.Physics.Arcade.Body;
   coinBody.setCollideWorldBounds(false);
-  coinBody.setGravityY(200);
   coinBody.setVelocityY((level - 1) * FALL_SPEED_STEP);
 }
 
