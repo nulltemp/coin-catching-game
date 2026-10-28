@@ -197,6 +197,14 @@ function endGame(this: Phaser.Scene) {
     )
     .setOrigin(0.5);
 
+  // ボタンとキーの同時入力で restart が二重に呼ばれないようにする
+  let restarting = false;
+  const restart = () => {
+    if (restarting) return;
+    restarting = true;
+    this.scene.restart();
+  };
+
   this.add
     .text(400, 430, "もう一度プレイ", {
       fontSize: "32px",
@@ -206,9 +214,19 @@ function endGame(this: Phaser.Scene) {
     })
     .setOrigin(0.5)
     .setInteractive({ useHandCursor: true })
-    .on("pointerdown", () => {
-      this.scene.restart();
-    });
+    .on("pointerdown", restart);
+
+  // キーボードでもリスタートできるようにする（リスナーはシーン終了時に自動で解除される）
+  const keyboard = this.input.keyboard!;
+  keyboard.once("keydown-SPACE", restart);
+  keyboard.once("keydown-ENTER", restart);
+
+  this.add
+    .text(400, 485, "Space / Enter でもリスタート", {
+      fontSize: "20px",
+      color: "#aaa",
+    })
+    .setOrigin(0.5);
 }
 
 function update(this: Phaser.Scene) {
