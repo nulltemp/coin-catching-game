@@ -54,6 +54,8 @@ npm run dev
 │   └── main.ts          # ゲームロジック一式（preload / create / update）
 ├── public/
 │   ├── assets/           # player.png, coin.png などの静的アセット
+│   ├── og-image.png      # SNS シェア用の OGP 画像
+│   ├── robots.txt
 │   └── sitemap.xml
 └── tsconfig.json
 ```
