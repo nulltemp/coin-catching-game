@@ -6,6 +6,7 @@ Phaser 4 と TypeScript で作られた、シンプルなコインキャッチ�
 
 ## 遊び方
 
+- 表示言語は日本語と英語に対応。初回はブラウザの言語設定で決まり、スタート画面のボタンで切り替えられる（選択は保存される）
 - スタート画面の「スタート」をクリック、または Space / Enter キーでゲーム開始
 - ← / → キーでプレイヤー（青いバー）を左右に移動
 - スマホ・タブレットでは画面をタッチ（PCではマウスを押したまま）すると、その位置へプレイヤーが移動
@@ -52,7 +53,8 @@ npm run dev
 .
 ├── index.html          # Vite エントリーポイント（Google Analytics タグを含む）
 ├── src/
-│   └── main.ts          # ゲームロジック一式（preload / create / update）
+│   ├── main.ts          # ゲームロジック一式（preload / create / update）
+│   └── i18n.ts          # 日本語・英語の文言と言語の判定・切り替え
 ├── public/
 │   ├── assets/           # player.png, coin.png などの静的アセット
 │   ├── og-image.png      # SNS シェア用の OGP 画像
@@ -63,7 +65,7 @@ npm run dev
 
 ## アーキテクチャ概要
 
-ゲームロジックはすべて [src/main.ts](src/main.ts) にまとまっています。
+ゲームロジックはすべて [src/main.ts](src/main.ts) にまとまっています。画面に表示する文言は [src/i18n.ts](src/i18n.ts) で管理します。ページのタイトルや説明文などのメタ情報は、SEO のため日本語のまま固定しています。
 
 - `player` — 画面下部のスプライト。矢印キーで左右移動、重力なし、`immovable`
 - `coins` — Arcade Physics のグループ。`scheduleSpawn` でランダムなX座標に生成され、重力で落下

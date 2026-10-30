@@ -1,4 +1,5 @@
 import Phaser from "phaser";
+import { applyPageLanguage, t, toggleLanguage } from "./i18n";
 
 // ゲーム画面の論理サイズ（Phaser.Scale.FIT で実際の画面に合わせて拡大縮小される）
 const GAME_WIDTH = 800;
@@ -84,6 +85,8 @@ let countdownEvent: Phaser.Time.TimerEvent;
 let isPlaying = false;
 let hasSeenStartScreen = false; // スタート画面は初回のみ表示し、リスタート時はすぐ始める
 
+applyPageLanguage();
+
 const game = new Phaser.Game(config);
 
 function preload(this: Phaser.Scene) {
@@ -109,20 +112,20 @@ function create(this: Phaser.Scene) {
   coins = this.physics.add.group();
 
   // スコア表示
-  scoreText = this.add.text(HUD_MARGIN, HUD_MARGIN, "Score: 0", {
+  scoreText = this.add.text(HUD_MARGIN, HUD_MARGIN, t.score(0), {
     fontSize: "32px",
     color: "#fff",
   });
 
   // ハイスコア表示
-  highScoreText = this.add.text(HUD_MARGIN, 56, `High Score: ${highScore}`, {
+  highScoreText = this.add.text(HUD_MARGIN, 56, t.highScore(highScore), {
     fontSize: "24px",
     color: "#ff0",
   });
 
   // 制限時間表示（右端から16pxの位置に右揃えで配置し、桁数が変わっても見切れないようにする）
   timerText = this.add
-    .text(GAME_WIDTH - HUD_MARGIN, HUD_MARGIN, `Time: ${remainingTime}`, {
+    .text(GAME_WIDTH - HUD_MARGIN, HUD_MARGIN, t.time(remainingTime), {
       fontSize: "32px",
       color: "#fff",
     })
@@ -130,7 +133,7 @@ function create(this: Phaser.Scene) {
 
   // レベル表示
   levelText = this.add
-    .text(CENTER_X, HUD_MARGIN, `Lv: ${level}`, {
+    .text(CENTER_X, HUD_MARGIN, t.level(level), {
       fontSize: "32px",
       color: "#0ff",
     })
@@ -153,28 +156,40 @@ function showStartScreen(this: Phaser.Scene) {
   hasSeenStartScreen = true;
 
   const title = this.add
-    .text(CENTER_X, 190, "コインキャッチゲーム", {
+    .text(CENTER_X, 190, t.title, {
       fontSize: "48px",
       color: "#ff0",
     })
     .setOrigin(0.5);
 
   const instructions = this.add
-    .text(
-      CENTER_X,
-      300,
-      `${TIME_LIMIT}秒でコインをたくさんキャッチしよう！\n\nPC：← → キー / マウスを押したまま\nスマホ：画面をタッチ`,
-      {
-        fontSize: "24px",
-        color: "#fff",
-        align: "center",
-      }
-    )
+    .text(CENTER_X, 300, t.instructions(TIME_LIMIT), {
+      fontSize: "24px",
+      color: "#fff",
+      align: "center",
+    })
     .setOrigin(0.5);
 
-  const prompt = addActionPrompt.call(this, "スタート", "Space / Enter でもスタート", () => {
+  // 言語の切り替え（シーンを作り直して全ての文言を更新し、スタート画面を再表示する）
+  const languageButton = this.add
+    .text(HUD_MARGIN, GAME_HEIGHT - HUD_MARGIN, t.switchLanguage, {
+      fontSize: "20px",
+      color: "#0ff",
+      backgroundColor: "#333",
+      padding: { x: 12, y: 8 },
+    })
+    .setOrigin(0, 1)
+    .setInteractive({ useHandCursor: true })
+    .on("pointerdown", () => {
+      toggleLanguage();
+      hasSeenStartScreen = false;
+      this.scene.restart();
+    });
+
+  const prompt = addActionPrompt.call(this, t.start, t.startHint, () => {
     title.destroy();
     instructions.destroy();
+    languageButton.destroy();
     prompt.forEach((obj) => obj.destroy());
     startGame.call(this);
   });
@@ -191,7 +206,7 @@ function startGame(this: Phaser.Scene) {
     delay: 1000,
     callback: () => {
       remainingTime -= 1;
-      timerText.setText(`Time: ${remainingTime}`);
+      timerText.setText(t.time(remainingTime));
       if (remainingTime <= 0) {
         endGame.call(this);
       } else {
@@ -254,7 +269,7 @@ function updateLevel() {
   const newLevel = 1 + Math.floor(elapsed / LEVEL_DURATION);
   if (newLevel !== level) {
     level = newLevel;
-    levelText.setText(`Lv: ${level}`);
+    levelText.setText(t.level(level));
   }
 }
 
@@ -270,14 +285,14 @@ function endGame(this: Phaser.Scene) {
   if (isNewRecord) {
     highScore = score;
     saveHighScore(highScore);
-    highScoreText.setText(`High Score: ${highScore}`);
+    highScoreText.setText(t.highScore(highScore));
   }
 
   this.add
     .text(
       CENTER_X,
       250,
-      `Game Over\nScore: ${score}\nHigh Score: ${highScore}${isNewRecord ? "\nNew Record!" : ""}`,
+      `${t.gameOver}\n${t.score(score)}\n${t.highScore(highScore)}${isNewRecord ? `\n${t.newRecord}` : ""}`,
       {
         fontSize: "48px",
         color: "#fff",
@@ -287,7 +302,7 @@ function endGame(this: Phaser.Scene) {
     .setOrigin(0.5);
 
   this.time.delayedCall(RESTART_PROMPT_DELAY, () => {
-    addActionPrompt.call(this, "もう一度プレイ", "Space / Enter でもリスタート", () => {
+    addActionPrompt.call(this, t.playAgain, t.restartHint, () => {
       this.scene.restart();
     });
   });
@@ -334,6 +349,6 @@ function collectCoin(
   const coin = coinObj as Phaser.Physics.Arcade.Sprite;
   coin.destroy();
   score += 1;
-  scoreText.setText("Score: " + score);
+  scoreText.setText(t.score(score));
   generateCoin(); // 新しいコインを生成
 }
