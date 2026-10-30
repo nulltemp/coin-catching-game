@@ -80,7 +80,8 @@ let remainingTime = TIME_LIMIT;
 let timerText: Phaser.GameObjects.Text;
 let spawnEvent: Phaser.Time.TimerEvent;
 let countdownEvent: Phaser.Time.TimerEvent;
-let isGameOver = false;
+let isPlaying = false;
+let hasSeenStartScreen = false; // スタート画面は初回のみ表示し、リスタート時はすぐ始める
 
 const game = new Phaser.Game(config);
 
@@ -94,7 +95,7 @@ function create(this: Phaser.Scene) {
   score = 0;
   remainingTime = TIME_LIMIT;
   level = 1;
-  isGameOver = false;
+  isPlaying = false;
 
   // プレイヤーの作成
   player = this.physics.add.sprite(CENTER_X, GAME_HEIGHT - 50, "player");
@@ -137,6 +138,50 @@ function create(this: Phaser.Scene) {
   // カーソルキーの割り当て
   cursors = this.input.keyboard!.createCursorKeys();
 
+  // プレイヤーとコインの衝突判定
+  this.physics.add.overlap(player, coins, collectCoin, undefined, this);
+
+  if (hasSeenStartScreen) {
+    startGame.call(this);
+  } else {
+    showStartScreen.call(this);
+  }
+}
+
+function showStartScreen(this: Phaser.Scene) {
+  hasSeenStartScreen = true;
+
+  const title = this.add
+    .text(CENTER_X, 190, "コインキャッチゲーム", {
+      fontSize: "48px",
+      color: "#ff0",
+    })
+    .setOrigin(0.5);
+
+  const instructions = this.add
+    .text(
+      CENTER_X,
+      300,
+      `${TIME_LIMIT}秒でコインをたくさんキャッチしよう！\n\nPC：← → キー / マウスを押したまま\nスマホ：画面をタッチ`,
+      {
+        fontSize: "24px",
+        color: "#fff",
+        align: "center",
+      }
+    )
+    .setOrigin(0.5);
+
+  const prompt = addActionPrompt.call(this, "スタート", "Space / Enter でもスタート", () => {
+    title.destroy();
+    instructions.destroy();
+    prompt.forEach((obj) => obj.destroy());
+    startGame.call(this);
+  });
+}
+
+function startGame(this: Phaser.Scene) {
+  isPlaying = true;
+
   // コインを生成するタイマー（レベルに応じて間隔が変わるので毎回スケジュールし直す）
   scheduleSpawn.call(this);
 
@@ -155,9 +200,44 @@ function create(this: Phaser.Scene) {
     callbackScope: this,
     loop: true,
   });
+}
 
-  // プレイヤーとコインの衝突判定
-  this.physics.add.overlap(player, coins, collectCoin, undefined, this);
+// ボタンと Space / Enter キーのどれでも実行できる操作を追加し、作成した表示物を返す
+function addActionPrompt(this: Phaser.Scene, label: string, hint: string, action: () => void) {
+  const keyboard = this.input.keyboard!;
+
+  // ボタンとキーの同時入力で action が二重に呼ばれないようにする
+  let activated = false;
+  const activate = () => {
+    if (activated) return;
+    activated = true;
+    keyboard.off("keydown-SPACE", activate);
+    keyboard.off("keydown-ENTER", activate);
+    action();
+  };
+
+  const button = this.add
+    .text(CENTER_X, 430, label, {
+      fontSize: "32px",
+      color: "#0f0",
+      backgroundColor: "#333",
+      padding: { x: 20, y: 10 },
+    })
+    .setOrigin(0.5)
+    .setInteractive({ useHandCursor: true })
+    .on("pointerdown", activate);
+
+  keyboard.on("keydown-SPACE", activate);
+  keyboard.on("keydown-ENTER", activate);
+
+  const hintText = this.add
+    .text(CENTER_X, 485, hint, {
+      fontSize: "20px",
+      color: "#aaa",
+    })
+    .setOrigin(0.5);
+
+  return [button, hintText];
 }
 
 function scheduleSpawn(this: Phaser.Scene) {
@@ -178,8 +258,8 @@ function updateLevel() {
 }
 
 function endGame(this: Phaser.Scene) {
-  if (isGameOver) return;
-  isGameOver = true;
+  if (!isPlaying) return;
+  isPlaying = false;
 
   spawnEvent.remove();
   countdownEvent.remove();
@@ -205,40 +285,13 @@ function endGame(this: Phaser.Scene) {
     )
     .setOrigin(0.5);
 
-  // ボタンとキーの同時入力で restart が二重に呼ばれないようにする
-  let restarting = false;
-  const restart = () => {
-    if (restarting) return;
-    restarting = true;
+  addActionPrompt.call(this, "もう一度プレイ", "Space / Enter でもリスタート", () => {
     this.scene.restart();
-  };
-
-  this.add
-    .text(CENTER_X, 430, "もう一度プレイ", {
-      fontSize: "32px",
-      color: "#0f0",
-      backgroundColor: "#333",
-      padding: { x: 20, y: 10 },
-    })
-    .setOrigin(0.5)
-    .setInteractive({ useHandCursor: true })
-    .on("pointerdown", restart);
-
-  // キーボードでもリスタートできるようにする（リスナーはシーン終了時に自動で解除される）
-  const keyboard = this.input.keyboard!;
-  keyboard.once("keydown-SPACE", restart);
-  keyboard.once("keydown-ENTER", restart);
-
-  this.add
-    .text(CENTER_X, 485, "Space / Enter でもリスタート", {
-      fontSize: "20px",
-      color: "#aaa",
-    })
-    .setOrigin(0.5);
+  });
 }
 
 function update(this: Phaser.Scene) {
-  if (isGameOver) return;
+  if (!isPlaying) return;
 
   // プレイヤーの移動（キーボード優先、なければタッチ／マウスの位置へ追従）
   const pointer = this.input.activePointer;

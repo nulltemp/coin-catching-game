@@ -42,6 +42,8 @@ The game uses Phaser's arcade physics on a logical 800×600 canvas (`GAME_WIDTH`
 - `remainingTime` — counts down from `TIME_LIMIT` (20s); at 0, `endGame` stops timers, pauses physics, saves the high score, and shows a restart button (Space / Enter also restart).
 - `highScore` — persisted in `localStorage` (`loadHighScore` / `saveHighScore`, wrapped in try/catch).
 
+- Start screen — `showStartScreen` is shown only on the first `create` (`hasSeenStartScreen`). `startGame` begins the spawn and countdown timers; restarts call it directly. `isPlaying` gates `update` and `endGame`.
+
 Coins are destroyed when they go below `GAME_HEIGHT` or are caught. `create` resets all state so `scene.restart()` works.
 
 Asset loading (`assets/player.png`, `assets/coin.png`) in `preload` resolves against `public/assets/`, which Vite serves at the same relative path in both dev and build.
