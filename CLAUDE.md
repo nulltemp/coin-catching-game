@@ -39,7 +39,7 @@ The game uses Phaser's arcade physics on a logical 800×600 canvas (`GAME_WIDTH`
 - `coins` — a physics group; `scheduleSpawn` spawns coins at random X positions at the top and reschedules itself, with the delay shrinking as `level` rises. Coins fall under the world gravity (`GRAVITY_Y`) plus an initial velocity that grows with `level`.
 - `level` — derived from elapsed time in `updateLevel` (every `LEVEL_DURATION` seconds).
 - `score` / `scoreText` — incremented when `player` overlaps a coin (`collectCoin`), which also spawns a replacement coin via `generateCoin`.
-- `remainingTime` — counts down from `TIME_LIMIT` (20s); at 0, `endGame` stops timers, pauses physics, saves the high score, and shows a restart button (Space / Enter also restart).
+- `remainingTime` — counts down from `TIME_LIMIT` (20s); at 0, `endGame` stops timers, pauses physics, saves the high score, and after `RESTART_PROMPT_DELAY` shows a restart button (Space / Enter also restart).
 - `highScore` — persisted in `localStorage` (`loadHighScore` / `saveHighScore`, wrapped in try/catch).
 
 - Start screen — `showStartScreen` is shown only on the first `create` (`hasSeenStartScreen`). `startGame` begins the spawn and countdown timers; restarts call it directly. `isPlaying` gates `update` and `endGame`.

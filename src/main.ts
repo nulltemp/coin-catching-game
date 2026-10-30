@@ -66,6 +66,7 @@ let cursors: Phaser.Types.Input.Keyboard.CursorKeys;
 
 const TIME_LIMIT = 20; // 秒
 const PLAYER_SPEED = 300;
+const RESTART_PROMPT_DELAY = 500; // ミリ秒。プレイ中の連打で結果を見ずにリスタートしないよう、少し待ってから表示する
 
 // 難易度: LEVEL_DURATION 秒ごとにレベルが上がり、コインの出現間隔が短く・落下が速くなる
 const LEVEL_DURATION = 5; // 秒
@@ -285,8 +286,10 @@ function endGame(this: Phaser.Scene) {
     )
     .setOrigin(0.5);
 
-  addActionPrompt.call(this, "もう一度プレイ", "Space / Enter でもリスタート", () => {
-    this.scene.restart();
+  this.time.delayedCall(RESTART_PROMPT_DELAY, () => {
+    addActionPrompt.call(this, "もう一度プレイ", "Space / Enter でもリスタート", () => {
+      this.scene.restart();
+    });
   });
 }
 
