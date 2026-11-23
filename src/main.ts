@@ -180,16 +180,26 @@ function showStartScreen(this: Phaser.Scene) {
     })
     .setOrigin(0, 1)
     .setInteractive({ useHandCursor: true })
-    .on("pointerdown", () => {
-      toggleLanguage();
-      hasSeenStartScreen = false;
-      this.scene.restart();
-    });
+    .on("pointerdown", () => switchLanguage());
+
+  // キーボードだけでも切り替えられるよう、L キーにも同じ処理を割り当てる
+  const keyboard = this.input.keyboard!;
+  let switching = false;
+  const switchLanguage = () => {
+    if (switching) return;
+    switching = true;
+    keyboard.off("keydown-L", switchLanguage);
+    toggleLanguage();
+    hasSeenStartScreen = false;
+    this.scene.restart();
+  };
+  keyboard.on("keydown-L", switchLanguage);
 
   const prompt = addActionPrompt.call(this, t.start, t.startHint, () => {
     title.destroy();
     instructions.destroy();
     languageButton.destroy();
+    keyboard.off("keydown-L", switchLanguage);
     prompt.forEach((obj) => obj.destroy());
     startGame.call(this);
   });

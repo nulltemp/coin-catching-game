@@ -14,7 +14,7 @@ const ja = {
   level: (value: number) => `Lv: ${value}`,
   gameOver: "ゲームオーバー",
   newRecord: "新記録！",
-  switchLanguage: "English", // 切り替え先の言語名
+  switchLanguage: "English (L)", // 切り替え先の言語名と、切り替えのキー
   privacyPolicy: "プライバシーポリシー",
 };
 
@@ -32,7 +32,7 @@ const en: typeof ja = {
   level: (value: number) => `Lv: ${value}`,
   gameOver: "Game Over",
   newRecord: "New Record!",
-  switchLanguage: "日本語",
+  switchLanguage: "日本語 (L)",
   privacyPolicy: "Privacy Policy",
 };
 
