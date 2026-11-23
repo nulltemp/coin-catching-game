@@ -30,7 +30,7 @@ This is a Phaser 4 browser game written in TypeScript and bundled with Vite. All
 - **`src/i18n.ts`** — Japanese and English messages (`t`), language detection from `localStorage` / `navigator.language`, and `toggleLanguage`. Add new on-screen text here instead of hard-coding it. Page metadata and the hidden description in `index.html` stay Japanese on purpose: crawlers often render in English, so rewriting them at runtime could hurt Japanese search results.
 - **`public/assets/`** — static assets (`player.png`, `coin.png`) served as-is by Vite at `/assets/...`
 - **`public/`** — also holds `og-image.png`, `robots.txt`, and `sitemap.xml`
-- **`ROADMAP.md`** — monetization assessment and TODO list (in Japanese)
+- **`ROADMAP.md`** — monetization assessment and completed TODOs (in Japanese). Known issues and open TODOs are tracked as GitHub Issues, not in this file
 
 ### Game Structure
 
