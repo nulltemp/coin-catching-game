@@ -16,6 +16,8 @@ const RESULT_Y = 250; // 結果（ゲームオーバー・スコアなど）
 const ACTION_BUTTON_Y = 430; // スタート・もう一度遊ぶボタン
 const ACTION_HINT_Y = 485; // ボタンの下のキー操作の案内
 const COIN_SPAWN_MARGIN = 50; // コインを出現させない左右の余白
+const COIN_SPAWN_Y = -20; // コインは画面の上端より外（32px の画像が隠れる位置）に出し、HUD と重ならないようにする
+const RESULT_OVERLAY_ALPHA = 0.6; // 結果画面で止まったコインなどを暗くする板の不透明度
 
 // コインの落下に使う重力（プレイヤーは allowGravity = false なので影響を受けない）
 const GRAVITY_Y = 400;
@@ -180,7 +182,32 @@ function showStartScreen(this: Phaser.Scene) {
     .setOrigin(0.5);
 
   // 言語の切り替え（シーンを作り直して全ての文言を更新し、スタート画面を再表示する）
-  const languageButton = this.add
+  const languageButton = addLanguageButton.call(this, () => {
+    languageButton.destroy(); // 再起動を待たずに L キーの割り当てを外し、二重に切り替えないようにする
+    hasSeenStartScreen = false;
+    this.scene.restart();
+  });
+
+  const prompt = addActionPrompt.call(this, t.start, t.startHint, () => {
+    title.destroy();
+    instructions.destroy();
+    languageButton.destroy();
+    prompt.forEach((obj) => obj.destroy());
+    startGame.call(this);
+  });
+}
+
+// 左下に言語の切り替えボタンを置く。ボタンと L キーのどちらでも言語を切り替えてから onSwitch を呼ぶ。
+// ボタンを destroy すると L キーの割り当ても外れる
+function addLanguageButton(this: Phaser.Scene, onSwitch: () => void) {
+  const keyboard = this.input.keyboard!;
+  const switchLanguage = () => {
+    toggleLanguage();
+    button.setText(t.switchLanguage);
+    onSwitch();
+  };
+
+  const button = this.add
     .text(HUD_MARGIN, GAME_HEIGHT - HUD_MARGIN, t.switchLanguage, {
       fontSize: "20px",
       color: "#0ff",
@@ -189,29 +216,13 @@ function showStartScreen(this: Phaser.Scene) {
     })
     .setOrigin(0, 1)
     .setInteractive({ useHandCursor: true })
-    .on("pointerdown", () => switchLanguage());
+    .on("pointerdown", switchLanguage)
+    .once(Phaser.GameObjects.Events.DESTROY, () => keyboard.off("keydown-L", switchLanguage));
 
   // キーボードだけでも切り替えられるよう、L キーにも同じ処理を割り当てる
-  const keyboard = this.input.keyboard!;
-  let switching = false;
-  const switchLanguage = () => {
-    if (switching) return;
-    switching = true;
-    keyboard.off("keydown-L", switchLanguage);
-    toggleLanguage();
-    hasSeenStartScreen = false;
-    this.scene.restart();
-  };
   keyboard.on("keydown-L", switchLanguage);
 
-  const prompt = addActionPrompt.call(this, t.start, t.startHint, () => {
-    title.destroy();
-    instructions.destroy();
-    languageButton.destroy();
-    keyboard.off("keydown-L", switchLanguage);
-    prompt.forEach((obj) => obj.destroy());
-    startGame.call(this);
-  });
+  return button;
 }
 
 function startGame(this: Phaser.Scene) {
@@ -307,22 +318,34 @@ function endGame(this: Phaser.Scene) {
     highScoreText.setText(t.highScore(highScore));
   }
 
-  this.add
-    .text(
-      CENTER_X,
-      RESULT_Y,
-      `${t.gameOver}\n${t.score(score)}\n${t.highScore(highScore)}${isNewRecord ? `\n${t.newRecord}` : ""}`,
-      {
-        fontSize: "48px",
-        color: "#fff",
-        align: "center",
-      }
-    )
+  // 止まったコインやプレイヤーが結果の文字に重ならないよう、画面全体を暗くする板を敷く
+  this.add.rectangle(CENTER_X, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, 0x000000, RESULT_OVERLAY_ALPHA);
+
+  const resultMessage = () =>
+    `${t.gameOver}\n${t.score(score)}\n${t.highScore(highScore)}${isNewRecord ? `\n${t.newRecord}` : ""}`;
+  const resultText = this.add
+    .text(CENTER_X, RESULT_Y, resultMessage(), {
+      fontSize: "48px",
+      color: "#fff",
+      align: "center",
+    })
     .setOrigin(0.5);
 
   this.time.delayedCall(RESTART_PROMPT_DELAY, () => {
-    addActionPrompt.call(this, t.playAgain, t.restartHint, () => {
+    const [button, hintText] = addActionPrompt.call(this, t.playAgain, t.restartHint, () => {
+      languageButton.destroy();
       this.scene.restart();
+    });
+
+    // 結果画面でも言語を切り替えられるようにする。結果を残したまま、表示中の文言だけを差し替える
+    const languageButton = addLanguageButton.call(this, () => {
+      resultText.setText(resultMessage());
+      button.setText(t.playAgain);
+      hintText.setText(t.restartHint);
+      scoreText.setText(t.score(score));
+      highScoreText.setText(t.highScore(highScore));
+      timerText.setText(t.time(remainingTime));
+      levelText.setText(t.level(level));
     });
   });
 }
@@ -355,7 +378,7 @@ function update(this: Phaser.Scene) {
 
 function generateCoin() {
   const x = Phaser.Math.Between(COIN_SPAWN_MARGIN, GAME_WIDTH - COIN_SPAWN_MARGIN); // ランダムなX座標
-  const coin = coins.create(x, 0, "coin") as Phaser.Physics.Arcade.Sprite;
+  const coin = coins.create(x, COIN_SPAWN_Y, "coin") as Phaser.Physics.Arcade.Sprite;
   const coinBody = coin.body as Phaser.Physics.Arcade.Body;
   coinBody.setCollideWorldBounds(false);
   coinBody.setVelocityY((level - 1) * FALL_SPEED_STEP);
