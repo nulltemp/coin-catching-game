@@ -6,6 +6,15 @@ const GAME_WIDTH = 800;
 const GAME_HEIGHT = 600;
 const CENTER_X = GAME_WIDTH / 2;
 const HUD_MARGIN = 16; // 画面端から HUD テキストまでの余白
+const HIGH_SCORE_Y = 56; // スコア（32px）の下に並べるハイスコアの Y 座標
+const PLAYER_Y = GAME_HEIGHT - 50;
+
+// スタート画面・結果画面の各要素の中心の Y 座標
+const TITLE_Y = 190;
+const INSTRUCTIONS_Y = 300;
+const RESULT_Y = 250; // 結果（ゲームオーバー・スコアなど）
+const ACTION_BUTTON_Y = 430; // スタート・もう一度遊ぶボタン
+const ACTION_HINT_Y = 485; // ボタンの下のキー操作の案内
 const COIN_SPAWN_MARGIN = 50; // コインを出現させない左右の余白
 
 // コインの落下に使う重力（プレイヤーは allowGravity = false なので影響を受けない）
@@ -87,7 +96,7 @@ let hasSeenStartScreen = false; // スタート画面は初回のみ表示し、
 
 applyPageLanguage();
 
-const game = new Phaser.Game(config);
+new Phaser.Game(config);
 
 function preload(this: Phaser.Scene) {
   this.load.image("player", "assets/player.png");
@@ -102,7 +111,7 @@ function create(this: Phaser.Scene) {
   isPlaying = false;
 
   // プレイヤーの作成
-  player = this.physics.add.sprite(CENTER_X, GAME_HEIGHT - 50, "player");
+  player = this.physics.add.sprite(CENTER_X, PLAYER_Y, "player");
   playerBody = player.body as Phaser.Physics.Arcade.Body;
   playerBody.setCollideWorldBounds(true);
   playerBody.allowGravity = false;
@@ -118,7 +127,7 @@ function create(this: Phaser.Scene) {
   });
 
   // ハイスコア表示
-  highScoreText = this.add.text(HUD_MARGIN, 56, t.highScore(highScore), {
+  highScoreText = this.add.text(HUD_MARGIN, HIGH_SCORE_Y, t.highScore(highScore), {
     fontSize: "24px",
     color: "#ff0",
   });
@@ -156,14 +165,14 @@ function showStartScreen(this: Phaser.Scene) {
   hasSeenStartScreen = true;
 
   const title = this.add
-    .text(CENTER_X, 190, t.title, {
+    .text(CENTER_X, TITLE_Y, t.title, {
       fontSize: "48px",
       color: "#ff0",
     })
     .setOrigin(0.5);
 
   const instructions = this.add
-    .text(CENTER_X, 300, t.instructions(TIME_LIMIT), {
+    .text(CENTER_X, INSTRUCTIONS_Y, t.instructions(TIME_LIMIT), {
       fontSize: "24px",
       color: "#fff",
       align: "center",
@@ -243,7 +252,7 @@ function addActionPrompt(this: Phaser.Scene, label: string, hint: string, action
   };
 
   const button = this.add
-    .text(CENTER_X, 430, label, {
+    .text(CENTER_X, ACTION_BUTTON_Y, label, {
       fontSize: "32px",
       color: "#0f0",
       backgroundColor: "#333",
@@ -257,7 +266,7 @@ function addActionPrompt(this: Phaser.Scene, label: string, hint: string, action
   keyboard.on("keydown-ENTER", activate);
 
   const hintText = this.add
-    .text(CENTER_X, 485, hint, {
+    .text(CENTER_X, ACTION_HINT_Y, hint, {
       fontSize: "20px",
       color: "#aaa",
     })
@@ -301,7 +310,7 @@ function endGame(this: Phaser.Scene) {
   this.add
     .text(
       CENTER_X,
-      250,
+      RESULT_Y,
       `${t.gameOver}\n${t.score(score)}\n${t.highScore(highScore)}${isNewRecord ? `\n${t.newRecord}` : ""}`,
       {
         fontSize: "48px",
