@@ -34,7 +34,7 @@ This is a Phaser 4 browser game written in TypeScript and bundled with Vite. All
 
 ### Game Structure
 
-The game uses Phaser's arcade physics on a logical 800×600 canvas (`GAME_WIDTH` / `GAME_HEIGHT`), scaled to the window with `Phaser.Scale.FIT`. Use these constants (and `CENTER_X`, `HUD_MARGIN`, and the layout constants such as `HIGH_SCORE_Y`, `TITLE_Y`, `RESULT_Y`, `ACTION_BUTTON_Y`) instead of hard-coded coordinates; `tsconfig.json` has `noUnusedLocals`, so unused variables fail `npm run typecheck`.
+The game uses Phaser's arcade physics on a logical 800×600 canvas (`GAME_WIDTH` / `GAME_HEIGHT`), scaled to the window with `Phaser.Scale.FIT`. Use these constants (and `CENTER_X`, `HUD_MARGIN`, and the layout constants such as `HIGH_SCORE_Y`, `TITLE_Y`, `RESULT_Y`, `ACTION_BUTTON_Y`) instead of hard-coded coordinates. Every `this.add.text` passes `fontFamily: FONT_FAMILY` (a system Japanese font stack, so kana/kanji and digits share one typeface; no web font is loaded). `tsconfig.json` has `noUnusedLocals`, so unused variables fail `npm run typecheck`.
 
 - `player` — a sprite near the bottom; moves left/right with arrow keys, or toward the pointer while touching / holding the mouse. Gravity disabled, immovable.
 - `coins` — a physics group; `scheduleSpawn` spawns coins at random X positions at the top and reschedules itself, with the delay shrinking as `level` rises. Coins fall under the world gravity (`GRAVITY_Y`) plus an initial velocity that grows with `level`.
