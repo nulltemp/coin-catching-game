@@ -19,7 +19,7 @@ Other scripts:
 - `npm run preview` — serve the built `dist/` output locally
 - `npm run typecheck` — type-check with `tsc --noEmit`
 
-There are no tests and no linter configured. Run `npm run typecheck` and `npm run build` to validate changes. GitHub Actions (`.github/workflows/ci.yml`) runs `npm ci`, `npm run typecheck`, and `npm run build` on pushes to `master` and on pull requests.
+There are no tests and no linter configured. Run `npm run typecheck` and `npm run build` to validate changes. GitHub Actions (`.github/workflows/ci.yml`) runs `npm ci`, `npm run typecheck`, and `npm run build` on pushes to `master` and on pull requests. Dependabot (`.github/dependabot.yml`) opens monthly update PRs for npm (minor/patch grouped; Phaser major updates ignored, upgrade those by hand after testing) and GitHub Actions; merge them only after CI passes.
 
 ## Architecture
 
