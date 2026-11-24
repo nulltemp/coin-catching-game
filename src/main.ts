@@ -19,6 +19,11 @@ const COIN_SPAWN_MARGIN = 50; // コインを出現させない左右の余白
 const COIN_SPAWN_Y = -20; // コインは画面の上端より外（32px の画像が隠れる位置）に出し、HUD と重ならないようにする
 const RESULT_OVERLAY_ALPHA = 0.6; // 結果画面で止まったコインなどを暗くする板の不透明度
 
+// ゲーム内の全テキストの書体。Phaser の既定（Courier）のままだと日本語だけ別の書体で表示され、
+// 数字と書体が揃わないため、日本語と英数字の両方を持つ OS 標準の書体を先に並べる（Web フォントは読み込まない）
+const FONT_FAMILY =
+  '"Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic UI", "Meiryo", "Noto Sans CJK JP", "Noto Sans JP", sans-serif';
+
 // コインの落下に使う重力（プレイヤーは allowGravity = false なので影響を受けない）
 const GRAVITY_Y = 400;
 
@@ -124,12 +129,14 @@ function create(this: Phaser.Scene) {
 
   // スコア表示
   scoreText = this.add.text(HUD_MARGIN, HUD_MARGIN, t.score(0), {
+    fontFamily: FONT_FAMILY,
     fontSize: "32px",
     color: "#fff",
   });
 
   // ハイスコア表示
   highScoreText = this.add.text(HUD_MARGIN, HIGH_SCORE_Y, t.highScore(highScore), {
+    fontFamily: FONT_FAMILY,
     fontSize: "24px",
     color: "#ff0",
   });
@@ -137,6 +144,7 @@ function create(this: Phaser.Scene) {
   // 制限時間表示（右端から16pxの位置に右揃えで配置し、桁数が変わっても見切れないようにする）
   timerText = this.add
     .text(GAME_WIDTH - HUD_MARGIN, HUD_MARGIN, t.time(remainingTime), {
+      fontFamily: FONT_FAMILY,
       fontSize: "32px",
       color: "#fff",
     })
@@ -145,6 +153,7 @@ function create(this: Phaser.Scene) {
   // レベル表示
   levelText = this.add
     .text(CENTER_X, HUD_MARGIN, t.level(level), {
+      fontFamily: FONT_FAMILY,
       fontSize: "32px",
       color: "#0ff",
     })
@@ -168,6 +177,7 @@ function showStartScreen(this: Phaser.Scene) {
 
   const title = this.add
     .text(CENTER_X, TITLE_Y, t.title, {
+      fontFamily: FONT_FAMILY,
       fontSize: "48px",
       color: "#ff0",
     })
@@ -175,6 +185,7 @@ function showStartScreen(this: Phaser.Scene) {
 
   const instructions = this.add
     .text(CENTER_X, INSTRUCTIONS_Y, t.instructions(TIME_LIMIT), {
+      fontFamily: FONT_FAMILY,
       fontSize: "24px",
       color: "#fff",
       align: "center",
@@ -209,6 +220,7 @@ function addLanguageButton(this: Phaser.Scene, onSwitch: () => void) {
 
   const button = this.add
     .text(HUD_MARGIN, GAME_HEIGHT - HUD_MARGIN, t.switchLanguage, {
+      fontFamily: FONT_FAMILY,
       fontSize: "20px",
       color: "#0ff",
       backgroundColor: "#333",
@@ -270,6 +282,7 @@ function addActionPrompt(this: Phaser.Scene, label: string, hint: string, action
 
   const button = this.add
     .text(CENTER_X, ACTION_BUTTON_Y, label, {
+      fontFamily: FONT_FAMILY,
       fontSize: "32px",
       color: "#0f0",
       backgroundColor: "#333",
@@ -284,6 +297,7 @@ function addActionPrompt(this: Phaser.Scene, label: string, hint: string, action
 
   const hintText = this.add
     .text(CENTER_X, ACTION_HINT_Y, hint, {
+      fontFamily: FONT_FAMILY,
       fontSize: "20px",
       color: "#aaa",
     })
@@ -331,6 +345,7 @@ function endGame(this: Phaser.Scene) {
     `${t.gameOver}\n${t.score(score)}\n${t.highScore(highScore)}${isNewRecord ? `\n${t.newRecord}` : ""}`;
   const resultText = this.add
     .text(CENTER_X, RESULT_Y, resultMessage(), {
+      fontFamily: FONT_FAMILY,
       fontSize: "48px",
       color: "#fff",
       align: "center",
