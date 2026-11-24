@@ -18,7 +18,7 @@
     }
   </script>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>コインキャッチゲーム｜無料ブラウザゲーム（Coin Catching Game）</title>
   <meta name="description" content="降ってくるコインをキャッチして20秒でハイスコアを狙う、無料のブラウザミニゲーム。インストール不要で、PCは矢印キー、スマホ・タブレットはタッチ操作ですぐに遊べます。">
   <link rel="canonical" href="https://coin-catching-game.nulltemp.com/">
@@ -78,6 +78,10 @@
       bottom: 6px;
       z-index: 10;
       font: 12px/1.4 sans-serif;
+    }
+    /* プレイ中は右下を押したときにリンクが反応してページを離れないよう隠す（src/main.ts の setPlaying） */
+    body.is-playing .site-footer {
+      visibility: hidden;
     }
     .site-footer a {
       color: #888;

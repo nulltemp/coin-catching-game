@@ -19,7 +19,7 @@ Other scripts:
 - `npm run preview` — serve the built `dist/` output locally
 - `npm run typecheck` — type-check with `tsc --noEmit`
 
-There are no tests and no linter configured. Run `npm run typecheck` and `npm run build` to validate changes.
+There are no tests and no linter configured. Run `npm run typecheck` and `npm run build` to validate changes. GitHub Actions (`.github/workflows/ci.yml`) runs `npm ci`, `npm run typecheck`, and `npm run build` on pushes to `master` and on pull requests.
 
 ## Architecture
 
