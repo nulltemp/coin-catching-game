@@ -111,6 +111,9 @@ function preload(this: Phaser.Scene) {
 }
 
 function create(this: Phaser.Scene) {
+  // index.html の「読み込み中」の表示を消す（リスタート時は既に無い）
+  document.getElementById("loading")?.remove();
+
   // 状態のリセット（scene.restart() での再実行に対応）
   score = 0;
   remainingTime = TIME_LIMIT;

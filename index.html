@@ -25,7 +25,8 @@
   <link rel="privacy-policy" href="https://nulltemp.com/privacy/">
   <meta name="theme-color" content="#000000">
   <link rel="icon" type="image/png" href="/assets/coin.png">
-  <link rel="apple-touch-icon" href="/assets/coin.png">
+  <!-- ホーム画面用。coin.png（32px）を最近傍補間で拡大し、黒背景に置いた 180px の画像 -->
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 
   <!-- OGP / SNS シェア -->
   <meta property="og:type" content="website">
@@ -69,7 +70,22 @@
       padding: 0;
       background-color: #000000;
       overflow: hidden;
+    }
+    /* ゲーム画面の上ではドラッグやピンチでページがスクロール・拡大しないようにする。
+       body 全体には付けないので、ゲーム画面の外（左右・上下の余白やフッター）ではピンチ拡大できる */
+    canvas {
       touch-action: none;
+    }
+    /* JS の読み込み中に表示し、ゲームの最初の画面ができたら消す（src/main.ts の create） */
+    .loading {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ccc;
+      font: 20px/1.4 sans-serif;
+      pointer-events: none;
     }
     /* ゲーム画面の邪魔にならないよう右下隅に小さく表示 */
     .site-footer {
@@ -105,6 +121,8 @@
       border: 0;
     }
   </style>
+  <!-- JS が無効なら読み込みは始まらないので、読み込み中の表示を出さない -->
+  <noscript><style>.loading { display: none; }</style></noscript>
 </head>
 <body>
   <main class="visually-hidden">
@@ -120,6 +138,22 @@
   <footer class="site-footer">
     <a href="https://nulltemp.com/privacy/">プライバシーポリシー</a>
   </footer>
+  <div id="loading" class="loading" role="status">読み込み中…</div>
+  <script>
+    // src/i18n.ts の loadLanguage と同じ判定で、英語ならメッセージを差し替える（ゲーム本体の JS より先に表示するためインラインで書く）
+    (function () {
+      let lang = null;
+      try {
+        lang = localStorage.getItem('coin-catching-game-language');
+      } catch (e) {
+        // localStorage が使えない環境ではブラウザの言語設定に従う
+      }
+      if (lang !== 'ja' && lang !== 'en') {
+        lang = navigator.language.toLowerCase().startsWith('ja') ? 'ja' : 'en';
+      }
+      if (lang === 'en') document.getElementById('loading').textContent = 'Loading…';
+    })();
+  </script>
   <noscript>このゲームを遊ぶには JavaScript を有効にしてください。</noscript>
   <script type="module" src="/src/main.ts"></script>
 </body>
