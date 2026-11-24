@@ -110,7 +110,7 @@ function create(this: Phaser.Scene) {
   score = 0;
   remainingTime = TIME_LIMIT;
   level = 1;
-  isPlaying = false;
+  setPlaying(false);
 
   // プレイヤーの作成
   player = this.physics.add.sprite(CENTER_X, PLAYER_Y, "player");
@@ -225,8 +225,14 @@ function addLanguageButton(this: Phaser.Scene, onSwitch: () => void) {
   return button;
 }
 
+// プレイ中はフッターのリンク（プライバシーポリシー）を誤タップしないよう、body のクラスで隠す（index.html の CSS）
+function setPlaying(value: boolean) {
+  isPlaying = value;
+  document.body.classList.toggle("is-playing", value);
+}
+
 function startGame(this: Phaser.Scene) {
-  isPlaying = true;
+  setPlaying(true);
 
   // コインを生成するタイマー（レベルに応じて間隔が変わるので毎回スケジュールし直す）
   scheduleSpawn.call(this);
@@ -305,7 +311,7 @@ function updateLevel() {
 
 function endGame(this: Phaser.Scene) {
   if (!isPlaying) return;
-  isPlaying = false;
+  setPlaying(false);
 
   spawnEvent.remove();
   countdownEvent.remove();
