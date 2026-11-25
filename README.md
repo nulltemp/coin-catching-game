@@ -68,6 +68,7 @@ PR と `master` への push では、GitHub Actions（`.github/workflows/ci.yml`
 │   └── dependabot.yml         # Dependabot の設定
 ├── ROADMAP.md               # 収益化の検討と対応済みの TODO（未対応の課題は GitHub Issues）
 ├── CLAUDE.md                # Claude Code 向けの開発メモ
+├── vite.config.ts           # Vite の設定（チャンクサイズ警告の閾値）
 └── tsconfig.json
 ```
 
