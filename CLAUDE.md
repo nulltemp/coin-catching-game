@@ -31,7 +31,7 @@ This is a Phaser 4 browser game written in TypeScript and bundled with Vite. All
 - **`src/main.ts`** — the entire game: imports Phaser as an ES module (`import Phaser from "phaser"`), Phaser config, and three lifecycle functions (`preload`, `create`, `update`) plus helpers
 - **`src/i18n.ts`** — Japanese and English messages (`t`), language detection from `localStorage` / `navigator.language`, and `toggleLanguage`. Add new on-screen text here instead of hard-coding it. Page metadata and the hidden description in `index.html` stay Japanese on purpose: crawlers often render in English, so rewriting them at runtime could hurt Japanese search results.
 - **`public/assets/`** — static assets (`player.png`, `coin.png`) served as-is by Vite at `/assets/...`
-- **`public/`** — also holds `apple-touch-icon.png` (180px, `coin.png` upscaled with nearest-neighbor on black), `og-image.png`, `robots.txt`, and `sitemap.xml`
+- **`public/`** — also holds `apple-touch-icon.png` (180px, `coin.png` upscaled with nearest-neighbor on black), `og-image-v2.png` (the OGP image: a mid-play screenshot centered on black under the title; renamed from `og-image.png` so SNS caches refetch it — rename again when replacing it), `robots.txt`, and `sitemap.xml`
 - **`ROADMAP.md`** — monetization assessment and completed TODOs (in Japanese). Known issues and open TODOs are tracked as GitHub Issues, not in this file
 
 ### Game Structure

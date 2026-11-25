@@ -60,7 +60,7 @@ PR と `master` への push では、GitHub Actions（`.github/workflows/ci.yml`
 ├── public/
 │   ├── assets/                # player.png, coin.png などの静的アセット
 │   ├── apple-touch-icon.png   # ホーム画面に追加したときのアイコン（180px）
-│   ├── og-image.png           # SNS シェア用の OGP 画像
+│   ├── og-image-v2.png        # SNS シェア用の OGP 画像
 │   ├── robots.txt
 │   └── sitemap.xml
 ├── .github/
