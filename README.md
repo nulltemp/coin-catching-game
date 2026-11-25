@@ -55,7 +55,14 @@ PR と `master` への push では、GitHub Actions（`.github/workflows/ci.yml`
 .
 ├── index.html               # Vite エントリーポイント（Google Analytics タグ、メタ情報を含む）
 ├── src/
-│   ├── main.ts               # ゲームロジック一式（preload / create / update）
+│   ├── main.ts               # Phaser の設定とシーンの登録
+│   ├── scenes/
+│   │   ├── PlayScene.ts      # プレイ画面（プレイヤー・コイン・HUD・ゲームの進行）
+│   │   ├── TitleScene.ts     # スタート画面（プレイ画面の上に重ねて表示）
+│   │   └── ResultScene.ts    # 結果画面（プレイ画面の上に重ねて表示）
+│   ├── constants.ts          # 画面配置・難易度などの定数
+│   ├── ui.ts                 # ボタンなどの共通 UI
+│   ├── highScore.ts          # ハイスコアの保存・読み込み
 │   └── i18n.ts               # 日本語・英語の文言と言語の判定・切り替え
 ├── public/
 │   ├── assets/                # player.png, coin.png などの静的アセット
@@ -74,7 +81,7 @@ PR と `master` への push では、GitHub Actions（`.github/workflows/ci.yml`
 
 ## アーキテクチャ概要
 
-ゲームロジックはすべて [src/main.ts](src/main.ts) にまとまっています。画面に表示する文言は [src/i18n.ts](src/i18n.ts) で管理します。ページのタイトルや説明文などのメタ情報は、SEO のため日本語のまま固定しています。
+ゲームロジックは [src/scenes/](src/scenes/) のシーンに分かれています。プレイ画面（`PlayScene`）が状態とゲームの進行を持ち、スタート画面（`TitleScene`）と結果画面（`ResultScene`）はその上に重ねて表示します。画面に表示する文言は [src/i18n.ts](src/i18n.ts) で管理します。ページのタイトルや説明文などのメタ情報は、SEO のため日本語のまま固定しています。
 
 - `player` — 画面下部のスプライト。矢印キーで左右移動し、キーを押していないときはタッチ／マウスを押した位置へ追従する。重力なし、`immovable`
 - `coins` — Arcade Physics のグループ。`scheduleSpawn` でランダムなX座標に生成され、重力で落下
