@@ -6,7 +6,7 @@ Phaser 4 と TypeScript で作られた、シンプルなコインキャッチ�
 
 ## 遊び方
 
-- 表示言語は日本語と英語に対応。初回はブラウザの言語設定で決まり、スタート画面のボタンまたは L キーで切り替えられる（選択は保存される）
+- 表示言語は日本語と英語に対応。初回はブラウザの言語設定で決まり、スタート画面・結果画面のボタンまたは L キーで切り替えられる（選択は保存される）
 - スタート画面の「スタート」をクリック、または Space / Enter キーでゲーム開始
 - ← / → キーでプレイヤー（グレーのロボット）を左右に移動
 - スマホ・タブレットでは画面をタッチ（PCではマウスを押したまま）すると、その位置へプレイヤーが移動
@@ -41,6 +41,8 @@ npm run dev
 
 テストおよびリンターは設定されていません。
 
+PR と `master` への push では、GitHub Actions（`.github/workflows/ci.yml`）が型チェック（`npm run typecheck`）とビルド（`npm run build`）を実行します。依存パッケージと GitHub Actions の更新は Dependabot（`.github/dependabot.yml`）が月1回確認します。
+
 ## 技術スタック
 
 - [Phaser 4](https://phaser.io/) — ゲームエンジン（Arcade Physics を使用）
@@ -51,15 +53,22 @@ npm run dev
 
 ```
 .
-├── index.html          # Vite エントリーポイント（Google Analytics タグを含む）
+├── index.html               # Vite エントリーポイント（Google Analytics タグ、メタ情報を含む）
 ├── src/
-│   ├── main.ts          # ゲームロジック一式（preload / create / update）
-│   └── i18n.ts          # 日本語・英語の文言と言語の判定・切り替え
+│   ├── main.ts               # ゲームロジック一式（preload / create / update）
+│   └── i18n.ts               # 日本語・英語の文言と言語の判定・切り替え
 ├── public/
-│   ├── assets/           # player.png, coin.png などの静的アセット
-│   ├── og-image.png      # SNS シェア用の OGP 画像
+│   ├── assets/                # player.png, coin.png などの静的アセット
+│   ├── apple-touch-icon.png   # ホーム画面に追加したときのアイコン（180px）
+│   ├── og-image.png           # SNS シェア用の OGP 画像
 │   ├── robots.txt
 │   └── sitemap.xml
+├── .github/
+│   ├── workflows/ci.yml       # CI（型チェックとビルド）
+│   └── dependabot.yml         # Dependabot の設定
+├── ROADMAP.md               # 収益化の検討と対応済みの TODO（未対応の課題は GitHub Issues）
+├── CLAUDE.md                # Claude Code 向けの開発メモ
+├── vite.config.ts           # Vite の設定（チャンクサイズ警告の閾値）
 └── tsconfig.json
 ```
 
@@ -67,12 +76,12 @@ npm run dev
 
 ゲームロジックはすべて [src/main.ts](src/main.ts) にまとまっています。画面に表示する文言は [src/i18n.ts](src/i18n.ts) で管理します。ページのタイトルや説明文などのメタ情報は、SEO のため日本語のまま固定しています。
 
-- `player` — 画面下部のスプライト。矢印キーで左右移動、重力なし、`immovable`
+- `player` — 画面下部のスプライト。矢印キーで左右移動し、キーを押していないときはタッチ／マウスを押した位置へ追従する。重力なし、`immovable`
 - `coins` — Arcade Physics のグループ。`scheduleSpawn` でランダムなX座標に生成され、重力で落下
 - `level` / `levelText` — 経過時間から `updateLevel` で算出。レベルに応じてコインの出現間隔（1000ms→最短400ms）と初速が変化
 - `score` / `scoreText` — コインと `player` が重なる（`collectCoin`）たびに加算
 - `remainingTime` / `timerText` — 1秒ごとにカウントダウンし、0になると `endGame` を呼びゲームを停止
 - `generateCoin` は`scheduleSpawn` と `collectCoin`（コイン取得時の即時補充）の両方から呼ばれる
-- コインは y=600 を超えると `update` 内で破棄される
+- コインは画面の下端（`GAME_HEIGHT`、y=600）を超えると `update` 内で破棄される
 
 アセット（`assets/player.png`, `assets/coin.png`）は `preload` 内で `public/assets/` を参照しており、dev / build のどちらでも同じ相対パスで配信されます。
