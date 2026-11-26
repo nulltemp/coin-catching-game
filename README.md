@@ -68,14 +68,13 @@ PR と `master` への push では、GitHub Actions（`.github/workflows/ci.yml`
 │   ├── assets/                # player.png, coin.png などの静的アセット
 │   ├── apple-touch-icon.png   # ホーム画面に追加したときのアイコン（180px）
 │   ├── og-image-v2.png        # SNS シェア用の OGP 画像
-│   ├── robots.txt
-│   └── sitemap.xml
+│   └── robots.txt
 ├── .github/
 │   ├── workflows/ci.yml       # CI（型チェックとビルド）
 │   └── dependabot.yml         # Dependabot の設定
 ├── ROADMAP.md               # 収益化の検討と対応済みの TODO（未対応の課題は GitHub Issues）
 ├── CLAUDE.md                # Claude Code 向けの開発メモ
-├── vite.config.ts           # Vite の設定（チャンクサイズ警告の閾値）
+├── vite.config.ts           # Vite の設定（チャンクサイズ警告の閾値、ビルド時の sitemap.xml の生成）
 └── tsconfig.json
 ```
 
