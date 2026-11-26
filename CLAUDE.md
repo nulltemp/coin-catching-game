@@ -19,7 +19,7 @@ Other scripts:
 - `npm run preview` — serve the built `dist/` output locally
 - `npm run typecheck` — type-check with `tsc --noEmit`
 
-`vite.config.ts` only raises `build.chunkSizeWarningLimit` (most of the ~1.38MB bundle is Phaser itself, so splitting would not avoid the 500KB warning).
+`vite.config.ts` raises `build.chunkSizeWarningLimit` (most of the ~1.38MB bundle is Phaser itself, so splitting would not avoid the 500KB warning) and adds the `sitemap` plugin that writes `dist/sitemap.xml` (see `public/` below).
 
 There are no tests and no linter configured. Run `npm run typecheck` and `npm run build` to validate changes. GitHub Actions (`.github/workflows/ci.yml`) runs `npm ci`, `npm run typecheck`, and `npm run build` on pushes to `master` and on pull requests. Dependabot (`.github/dependabot.yml`) opens monthly update PRs for npm (minor/patch grouped; Phaser major updates ignored, upgrade those by hand after testing) and GitHub Actions; merge them only after CI passes.
 
@@ -35,7 +35,7 @@ This is a Phaser 4 browser game written in TypeScript and bundled with Vite. Gam
 - **`src/constants.ts`** — layout, difficulty, and timing constants and the scene keys. **`src/ui.ts`** — `addActionPrompt` (button plus Space / Enter) and `addLanguageButton` (button plus L key), shared by the overlay scenes. **`src/highScore.ts`** — `loadHighScore` / `saveHighScore` (`localStorage`, wrapped in try/catch).
 - **`src/i18n.ts`** — Japanese and English messages (`t`), language detection from `localStorage` / `navigator.language`, and `toggleLanguage`. Add new on-screen text here instead of hard-coding it. Page metadata and the hidden description in `index.html` stay Japanese on purpose: crawlers often render in English, so rewriting them at runtime could hurt Japanese search results.
 - **`public/assets/`** — static assets (`player.png`, `coin.png`) served as-is by Vite at `/assets/...`
-- **`public/`** — also holds `apple-touch-icon.png` (180px, `coin.png` upscaled with nearest-neighbor on black), `og-image-v2.png` (the OGP image: a mid-play screenshot centered on black under the title; renamed from `og-image.png` so SNS caches refetch it — rename again when replacing it), `robots.txt`, and `sitemap.xml`
+- **`public/`** — also holds `apple-touch-icon.png` (180px, `coin.png` upscaled with nearest-neighbor on black), `og-image-v2.png` (the OGP image: a mid-play screenshot centered on black under the title; renamed from `og-image.png` so SNS caches refetch it — rename again when replacing it), and `robots.txt`. `sitemap.xml` is not in `public/`: the `sitemap` plugin in `vite.config.ts` writes it into `dist/` at build time with `<lastmod>` set to the last commit's date (`git log -1 --format=%cs`; the build date without git)
 - **`ROADMAP.md`** — monetization assessment and completed TODOs (in Japanese). Known issues and open TODOs are tracked as GitHub Issues, not in this file
 
 ### Game Structure

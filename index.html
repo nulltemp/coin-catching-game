@@ -76,7 +76,7 @@
     canvas {
       touch-action: none;
     }
-    /* JS の読み込み中に表示し、ゲームの最初の画面ができたら消す（src/main.ts の create） */
+    /* JS の読み込み中に表示し、ゲームの最初の画面ができたら消す（src/scenes/PlayScene.ts の create） */
     .loading {
       position: fixed;
       inset: 0;
@@ -95,7 +95,7 @@
       z-index: 10;
       font: 12px/1.4 sans-serif;
     }
-    /* プレイ中は右下を押したときにリンクが反応してページを離れないよう隠す（src/main.ts の setPlaying） */
+    /* プレイ中は右下を押したときにリンクが反応してページを離れないよう隠す（src/scenes/PlayScene.ts の setPlaying） */
     body.is-playing .site-footer {
       visibility: hidden;
     }
