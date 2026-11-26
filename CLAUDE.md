@@ -21,7 +21,7 @@ Other scripts:
 
 `vite.config.ts` raises `build.chunkSizeWarningLimit` (most of the ~1.38MB bundle is Phaser itself, so splitting would not avoid the 500KB warning) and adds the `sitemap` plugin that writes `dist/sitemap.xml` (see `public/` below).
 
-There are no tests and no linter configured. Run `npm run typecheck` and `npm run build` to validate changes. GitHub Actions (`.github/workflows/ci.yml`) runs `npm ci`, `npm run typecheck`, and `npm run build` on pushes to `master` and on pull requests. Dependabot (`.github/dependabot.yml`) opens monthly update PRs for npm (minor/patch grouped; Phaser major updates ignored, upgrade those by hand after testing) and GitHub Actions; merge them only after CI passes.
+There are no tests and no linter configured. Run `npm run typecheck` and `npm run build` to validate changes. GitHub Actions (`.github/workflows/ci.yml`) runs `npm ci`, `npm run typecheck`, and `npm run build` on Node 24 (read from `.node-version`, which the Cloudflare Pages build also reads) on pushes to `master` and on pull requests. Dependabot (`.github/dependabot.yml`) opens monthly update PRs for npm (minor/patch grouped; Phaser major updates ignored, upgrade those by hand after testing) and GitHub Actions; merge them only after CI passes.
 
 ## Architecture
 
