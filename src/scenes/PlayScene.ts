@@ -1,25 +1,21 @@
 import Phaser from "phaser";
 import {
-  BASE_SPAWN_DELAY,
   CENTER_X,
   COIN_SPAWN_MARGIN,
   COIN_SPAWN_Y,
-  FALL_SPEED_STEP,
   FONT_FAMILY,
   GAME_HEIGHT,
   GAME_WIDTH,
   HIGH_SCORE_Y,
   HUD_MARGIN,
-  LEVEL_DURATION,
-  MIN_SPAWN_DELAY,
   PLAYER_SPEED,
   PLAYER_Y,
   SCENE_PLAY,
   SCENE_RESULT,
   SCENE_TITLE,
-  SPAWN_DELAY_STEP,
   TIME_LIMIT,
 } from "../constants";
+import { coinInitialVelocity, levelAt, spawnDelay } from "../difficulty";
 import { loadHighScore, saveHighScore } from "../highScore";
 import { t } from "../i18n";
 import type { ResultData } from "./ResultScene";
@@ -162,16 +158,14 @@ export class PlayScene extends Phaser.Scene {
   }
 
   private scheduleSpawn() {
-    const delay = Math.max(MIN_SPAWN_DELAY, BASE_SPAWN_DELAY - (this.level - 1) * SPAWN_DELAY_STEP);
-    this.spawnEvent = this.time.delayedCall(delay, () => {
+    this.spawnEvent = this.time.delayedCall(spawnDelay(this.level), () => {
       this.generateCoin();
       this.scheduleSpawn();
     });
   }
 
   private updateLevel() {
-    const elapsed = TIME_LIMIT - this.remainingTime;
-    const newLevel = 1 + Math.floor(elapsed / LEVEL_DURATION);
+    const newLevel = levelAt(TIME_LIMIT - this.remainingTime);
     if (newLevel !== this.level) {
       this.level = newLevel;
       this.levelText.setText(t.level(this.level));
@@ -228,7 +222,7 @@ export class PlayScene extends Phaser.Scene {
     const coin = this.coins.create(x, COIN_SPAWN_Y, "coin") as Phaser.Physics.Arcade.Sprite;
     const coinBody = coin.body as Phaser.Physics.Arcade.Body;
     coinBody.setCollideWorldBounds(false);
-    coinBody.setVelocityY((this.level - 1) * FALL_SPEED_STEP);
+    coinBody.setVelocityY(coinInitialVelocity(this.level));
   }
 
   private collectCoin(
