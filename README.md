@@ -68,6 +68,8 @@ PR と `master` への push では、GitHub Actions（`.github/workflows/ci.yml`
 │   ├── assets/                # player.png, coin.png などの静的アセット
 │   ├── apple-touch-icon.png   # ホーム画面に追加したときのアイコン（180px）
 │   ├── og-image-v2.png        # SNS シェア用の OGP 画像
+│   ├── 404.html               # 存在しないパスに返すページ（Cloudflare Pages が 404 で返す）
+│   ├── _headers               # Cloudflare Pages のレスポンスヘッダー（nosniff・キャッシュなど）
 │   └── robots.txt
 ├── .github/
 │   ├── workflows/ci.yml       # CI（型チェックとビルド）

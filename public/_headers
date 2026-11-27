@@ -1,0 +1,12 @@
+# Cloudflare Pages のレスポンスヘッダー（https://developers.cloudflare.com/pages/configuration/headers/）
+# X-Frame-Options / CSP の frame-ancestors は、ポータルへの載せ方（#25）を決めてから付けるか判断する。
+# CSP は GA のホストを許可する必要があるため、まだ付けていない。
+
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+
+# Vite がファイル名にハッシュを付けるファイル（vite.config.ts の build.assetsDir）なので、ずっとキャッシュしてよい。
+# /assets/ の player.png・coin.png はハッシュなしで、差し替えたときに古いままにならないよう対象外にしている
+/bundle/*
+  Cache-Control: public, max-age=31536000, immutable
