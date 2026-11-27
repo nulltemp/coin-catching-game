@@ -11,7 +11,8 @@ import {
   SCENE_RESULT,
 } from "../constants";
 import { t } from "../i18n";
-import { addActionPrompt, addLanguageButton } from "../ui";
+import { shareUrl } from "../share";
+import { addActionPrompt, addLanguageButton, addShareButton } from "../ui";
 import type { PlayData, PlayScene } from "./PlayScene";
 
 export interface ResultData {
@@ -42,8 +43,12 @@ export class ResultScene extends Phaser.Scene {
       .setOrigin(0.5);
 
     this.time.delayedCall(RESTART_PROMPT_DELAY, () => {
+      // 結果を X でシェアする。文面は押した時点の言語で作る
+      const shareButton = addShareButton(this, t.share, () => shareUrl(t.shareText(score)));
+
       const [button, hintText] = addActionPrompt(this, t.playAgain, t.restartHint, () => {
         languageButton.destroy();
+        shareButton.destroy();
         const data: PlayData = { showTitle: false };
         this.scene.start(SCENE_PLAY, data); // このシーンは止まり、PlayScene がすぐプレイを始める
       });
@@ -53,6 +58,7 @@ export class ResultScene extends Phaser.Scene {
         resultText.setText(resultMessage());
         button.setText(t.playAgain);
         hintText.setText(t.restartHint);
+        shareButton.setText(t.share);
         (this.scene.get(SCENE_PLAY) as PlayScene).refreshHud();
       });
     });

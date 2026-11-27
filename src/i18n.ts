@@ -14,6 +14,8 @@ const ja = {
   level: (value: number) => `Lv: ${value}`,
   gameOver: "ゲームオーバー",
   newRecord: "新記録！",
+  share: "X でシェア (S)", // シェアのボタンとキー
+  shareText: (score: number) => `コインキャッチゲームでスコア ${score} を出したよ！`,
   switchLanguage: "English (L)", // 切り替え先の言語名と、切り替えのキー
   privacyPolicy: "プライバシーポリシー",
 };
@@ -32,6 +34,8 @@ const en: typeof ja = {
   level: (value: number) => `Lv: ${value}`,
   gameOver: "Game Over",
   newRecord: "New Record!",
+  share: "Share on X (S)",
+  shareText: (score: number) => `I scored ${score} in Coin Catching Game!`,
   switchLanguage: "日本語 (L)",
   privacyPolicy: "Privacy Policy",
 };
