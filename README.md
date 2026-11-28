@@ -14,6 +14,7 @@ Phaser 4 と TypeScript で作られた、シンプルなコインキャッチ�
 - 上から降ってくるコインに触れるとスコア+1
 - 制限時間（20秒）が0になるとゲームオーバー
 - ゲームオーバー画面の「もう一度プレイ」をクリック、または Space / Enter キーでリスタート
+- ゲームオーバー画面右下の「X でシェア」ボタン、または S キーで、スコアを X に投稿する画面を新しいタブで開く
 
 ## セットアップ
 
@@ -38,10 +39,11 @@ npm run dev
 | `npm run build`     | `dist/` に本番用ビルドを出力          |
 | `npm run preview`   | ビルド済みの `dist/` をローカルで配信 |
 | `npm run typecheck` | `tsc --noEmit` で型チェックのみ実行   |
+| `npm test`          | Vitest で単体テストを1回実行          |
 
-テストおよびリンターは設定されていません。
+単体テストは Vitest で、Phaser に依存しない純粋なロジック（`src/*.test.ts`）を対象にしています（詳しくは CLAUDE.md）。リンターは設定されていません。
 
-PR と `master` への push では、GitHub Actions（`.github/workflows/ci.yml`）が型チェック（`npm run typecheck`）とビルド（`npm run build`）を実行します。依存パッケージと GitHub Actions の更新は Dependabot（`.github/dependabot.yml`）が月1回確認します。
+PR と `master` への push では、GitHub Actions（`.github/workflows/ci.yml`）が型チェック（`npm run typecheck`）・テスト（`npm test`）・ビルド（`npm run build`）を実行します。依存パッケージと GitHub Actions の更新は Dependabot（`.github/dependabot.yml`）が月1回確認します。
 
 ## 技術スタック
 
@@ -63,6 +65,10 @@ PR と `master` への push では、GitHub Actions（`.github/workflows/ci.yml`
 │   ├── constants.ts          # 画面配置・難易度などの定数
 │   ├── ui.ts                 # ボタンなどの共通 UI
 │   ├── highScore.ts          # ハイスコアの保存・読み込み
+│   ├── difficulty.ts         # 難易度の計算（レベル・出現間隔・初速）
+│   ├── share.ts              # X の投稿画面の URL の生成
+│   ├── press.ts              # ボタンの上で押し始めて離したかの判定（シェアボタン用）
+│   ├── *.test.ts             # 上の純粋なロジックの単体テスト（Vitest）
 │   └── i18n.ts               # 日本語・英語の文言と言語の判定・切り替え
 ├── public/
 │   ├── assets/                # player.png, coin.png などの静的アセット
@@ -72,7 +78,7 @@ PR と `master` への push では、GitHub Actions（`.github/workflows/ci.yml`
 │   ├── _headers               # Cloudflare Pages のレスポンスヘッダー（nosniff・キャッシュなど）
 │   └── robots.txt
 ├── .github/
-│   ├── workflows/ci.yml       # CI（型チェックとビルド）
+│   ├── workflows/ci.yml       # CI（型チェック・テスト・ビルド）
 │   └── dependabot.yml         # Dependabot の設定
 ├── ROADMAP.md               # 収益化の検討と対応済みの TODO（未対応の課題は GitHub Issues）
 ├── CLAUDE.md                # Claude Code 向けの開発メモ
