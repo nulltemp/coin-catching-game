@@ -1,6 +1,7 @@
 import Phaser from "phaser";
 import { ACTION_BUTTON_Y, ACTION_HINT_Y, CENTER_X, FONT_FAMILY, GAME_HEIGHT, GAME_WIDTH, HUD_MARGIN } from "./constants";
 import { t, toggleLanguage } from "./i18n";
+import { createPressTracker } from "./press";
 
 // 左下に言語の切り替えボタンを置く。ボタンと L キーのどちらでも言語を切り替えてから onSwitch を呼ぶ。
 // ボタンを destroy すると L キーの割り当ても外れる
@@ -33,12 +34,14 @@ export function addLanguageButton(scene: Phaser.Scene, onSwitch: () => void) {
 
 // 右下にシェアボタンを置く。ボタンと S キーのどちらでも getUrl() の URL（X の投稿画面）を新しいタブで開く。
 // スマホでは pointerdown がユーザー操作として扱われずポップアップがブロックされるため、ボタンは pointerup で開く。
+// ただしボタンの上で押し始めたときだけ開く（プレイ中から押し続けた指を離しただけで X が開かないようにする、#59）。
 // ボタンを destroy すると S キーの割り当ても外れる
 export function addShareButton(scene: Phaser.Scene, label: string, getUrl: () => string) {
   const keyboard = scene.input.keyboard!;
   const share = () => {
     window.open(getUrl(), "_blank", "noopener");
   };
+  const press = createPressTracker();
 
   const button = scene.add
     .text(GAME_WIDTH - HUD_MARGIN, GAME_HEIGHT - HUD_MARGIN, label, {
@@ -50,7 +53,11 @@ export function addShareButton(scene: Phaser.Scene, label: string, getUrl: () =>
     })
     .setOrigin(1, 1)
     .setInteractive({ useHandCursor: true })
-    .on("pointerup", share)
+    .on("pointerdown", () => press.down())
+    .on("pointerout", () => press.cancel())
+    .on("pointerup", () => {
+      if (press.up()) share();
+    })
     .once(Phaser.GameObjects.Events.DESTROY, () => keyboard.off("keydown-S", share));
 
   keyboard.on("keydown-S", share);

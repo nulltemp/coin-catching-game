@@ -1,4 +1,4 @@
-# 依存パッケージの更新を月1回確認する（#34）。PR は CI（typecheck・build）が通ってからマージする
+# 依存パッケージの更新を月1回確認する（#34）。PR は CI（typecheck・test・build）が通ってからマージする
 version: 2
 updates:
   - package-ecosystem: npm
